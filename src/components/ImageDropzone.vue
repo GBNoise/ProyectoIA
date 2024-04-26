@@ -3,10 +3,14 @@ import { Dropzone } from "dropzone";
 import { onBeforeMount, onMounted, ref } from "vue";
 import "dropzone/dist/dropzone.css";
 import { v4 } from "uuid";
+import { useStore } from "vuex";
 
-defineProps({
+const store = useStore();
+
+const props = defineProps({
   title: String,
   backgroundColor: String,
+  storeName: String,
 });
 
 onBeforeMount(() => {
@@ -34,9 +38,16 @@ onMounted(() => {
   dropzone.addFile = (...params) => {
     if (dropzone.files.length < 3) {
       originalAddFile(...params);
-      console.log("file uploaded", params);
     }
   };
+
+  dropzone.on("addedfile", (file) => {
+    store.commit("insert", {
+      payload: file,
+      storeName: props.storeName,
+      type: "image",
+    });
+  });
 });
 </script>
 
