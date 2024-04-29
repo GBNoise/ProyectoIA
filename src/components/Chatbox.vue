@@ -5,7 +5,7 @@ import * as lt from "../assets/lottiebook.json";
 
 const store = useStore();
 
-const story = computed(() => store.state.stories[0]);
+const story = computed(() => store.state.stories);
 const details = computed(() => store.state.results);
 
 const isShowStory = ref(true);
@@ -38,7 +38,7 @@ const tabs = [
     </div>
     <div class="story-container">
       <p class="story-text" v-if="story && isShowStory">
-        {{ story }}
+        {{ story[story.length - 1] }}
       </p>
       <div class="story-text" v-if="details && isShowDetails">
         <span

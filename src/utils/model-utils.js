@@ -119,12 +119,15 @@ export const generateStory = async ({ characters, scenarios, emotions }) => {
       ","
     )} y con las siguientes emociones ${emotions.join(",")};
     toma en cuenta que algunos de los inputs estan en ingles, pero el cuento tiene que ser español`;
-    const result = await model.generateContent(query);
 
-    console.log({ geminiResul: result });
+    const result = await model.generateContent(
+      query.replace(/(\r\n|\n|\r)/gm, " ")
+    );
 
-    const response = await result.response;
-    const text = await response.text();
+    console.log({ geminiResult: result });
+
+    const text = await result.response.text();
+
     console.log({ query, text });
     return text;
   } catch (e) {
@@ -148,7 +151,7 @@ export const predictMobileNet = async ({ images }) => {
             imageElement.onload = async () => {
               const prediction = await model.classify(imageElement);
 
-              resolve(prediction[0].className);
+              resolve(prediction[0].className.replace(/,.*$/g, ""));
             };
           };
           reader.onerror = reject;
