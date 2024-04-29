@@ -1,6 +1,6 @@
 <script setup>
 import { Dropzone } from "dropzone";
-import { onBeforeMount, onMounted, ref } from "vue";
+import { onBeforeMount, onMounted, watch, computed } from "vue";
 import "dropzone/dist/dropzone.css";
 import { v4 } from "uuid";
 import { useStore } from "vuex";
@@ -11,6 +11,7 @@ const props = defineProps({
   title: String,
   backgroundColor: String,
   storeName: String,
+  disabled: Boolean,
 });
 
 onBeforeMount(() => {
@@ -48,14 +49,21 @@ onMounted(() => {
       type: "image",
     });
   });
+
+  const files = computed(() => store.state.images[props.storeName]);
+
+  watch(files, () => {
+    console.log("here");
+    if (files.value.length === 0) dropzone.removeAllFiles();
+  });
 });
 </script>
 
 <template>
   <div class="dropzone-container" :style="{ backgroundColor: backgroundColor }">
     <div class="dropzone" :class="dropClass">
+      <h1>{{ title }}</h1>
       <div class="dz-message">
-        <h1>{{ title }}</h1>
         <p>suelta las imagenes aqui!</p>
       </div>
     </div>
@@ -67,11 +75,13 @@ onMounted(() => {
   border-radius: 2.5rem;
   background: white;
   min-width: 21.875rem;
-  height: 21.875rem;
+  min-height: 18.875rem;
   width: 100%;
   max-width: 21.875rem;
   margin: auto;
   box-shadow: 0 0.625rem 1.25rem rgba(0, 0, 0, 0.1);
+  border: 2px solid;
+  user-select: none;
 }
 .dropzone {
   height: 100%;
@@ -80,6 +90,7 @@ onMounted(() => {
   padding: 1rem;
   border-color: transparent;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   background: none;
@@ -114,9 +125,7 @@ onMounted(() => {
   font-size: 2.375rem;
   font-weight: bold;
   color: var(--title-color);
-  position: absolute;
-  top: -130px;
-  left: -60px;
+  text-align: left;
 }
 
 .dz-message p {

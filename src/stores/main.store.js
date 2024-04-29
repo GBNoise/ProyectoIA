@@ -13,6 +13,7 @@ const store = createStore({
       emotions: [],
     },
     stories: [],
+    isAppInitialized: false,
   },
 
   getters: {
@@ -25,6 +26,9 @@ const store = createStore({
     },
     getStories(state) {
       return [...state.stories];
+    },
+    getAppState(state) {
+      return state.isAppInitialized;
     },
   },
 
@@ -40,6 +44,27 @@ const store = createStore({
         case "story":
           console.log({ payload });
           state.stories = [...state.stories, payload];
+          break;
+
+        case "initApp":
+          state.isAppInitialized = true;
+          break;
+
+        case "resetState":
+          state.images = {
+            characters: [],
+            scenarios: [],
+            emotions: [],
+          };
+          state.results = {
+            characters: [],
+            scenarios: [],
+            emotions: [],
+          };
+          state.stories = [];
+
+          console.log("state reset");
+
           break;
       }
     },

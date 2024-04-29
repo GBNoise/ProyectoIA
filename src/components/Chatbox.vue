@@ -1,38 +1,77 @@
 <script setup>
 import { useStore } from "vuex";
-import { computed } from "vue";
+import { computed, ref } from "vue";
+import * as lt from "../assets/lottiebook.json";
 
 const store = useStore();
 
 const story = computed(() => store.getters.getStories[0]);
+const details = computed(() => store.state.results);
 
-console.log({ storyFromhere: story });
+const isShowStory = ref(true);
+const isShowDetails = ref(false);
+
+const tabs = [
+  {
+    title: "Cuento",
+    onClick: () => {
+      isShowDetails.value = false;
+      isShowStory.value = true;
+    },
+  },
+  {
+    title: "Detalles",
+    onClick: () => {
+      isShowStory.value = false;
+      isShowDetails.value = true;
+    },
+  },
+];
 </script>
 
 <template>
   <div class="chatbox">
     <div class="chatbox-tabs">
-      <span class="chatbox-tabs__tab">Cuento #1</span>
-      <span class="chatbox-tabs__tab">Cuento #2</span>
-      <span class="chatbox-tabs__tab">Cuento #3</span>
+      <span class="chatbox-tabs__tab" v-for="tab of tabs" @click="tab.onClick">
+        {{ tab.title }}
+      </span>
     </div>
     <div class="story-container">
-      <p class="story-text" v-if="story">
+      <p class="story-text" v-if="story && isShowStory">
         {{ story }}
       </p>
+      <div class="story-text" v-if="details && isShowDetails">
+        "Details"
+        <span v-for="[key, value] of Object.entries(details)">
+          {{ key }} : {{ value }}
+          <span v-for="val of value">{{ key }}: {{ val }}</span>
+        </span>
+      </div>
+      <lottie
+        class="my-lottie"
+        :animation-data="lt"
+        :loop="true"
+        :auto-play="true"
+      ></lottie>
     </div>
   </div>
 </template>
 
 <style scoped>
 .chatbox {
-  width: 100%;
-  height: 40vh;
+  min-width: calc(100% - 400px);
+  height: 100%;
   max-width: 1200px;
-  background: #fafafa;
-  border-radius: 10px 10px 0 0;
-  border: solid 1px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.my-lottie {
+  top: 0;
+  opacity: 0.1;
+  width: 100%;
+  pointer-events: none;
 }
 
 .story-text {
@@ -52,6 +91,7 @@ console.log({ storyFromhere: story });
   border-bottom: 1px solid;
   height: 40px;
   display: flex;
+  background: #fff;
 }
 .chatbox-tabs__tab {
   display: flex;

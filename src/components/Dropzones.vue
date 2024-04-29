@@ -1,8 +1,16 @@
 <script setup>
 import { ref } from "vue";
 import ImageDropzone from "./ImageDropzone.vue";
-import { predict, generateStory } from "../utils/model-utils";
+import {
+  predict,
+  generateStory,
+  generateStoryChatGPT,
+} from "../utils/model-utils";
 import { useStore } from "vuex";
+
+// backgroundColor="#98DDCA"
+// backgroundColor="#D5ECC2"
+// backgroundColor="#FFD3B4"
 
 const store = useStore();
 let isLoading = ref(false);
@@ -13,22 +21,29 @@ const handleSubmit = async (e) => {
 
   const categories = {
     characters: store.state.images.characters,
-    scenarios: store.state.images.emotions,
-    emotions: store.state.images.scenarios,
+    scenarios: store.state.images.scenarios,
+    emotions: store.state.images.emotions,
   };
 
-  for (let [key, value] of Object.entries(categories)) {
-    if (value.length <= 0) continue;
-    let result = await predict({ images: value });
+  console.log({ categories });
 
+  const predictions = await Promise.all(
+    Object.entries(categories).map(async ([key, value]) => {
+      console.log({ key, value });
+      if (value.length <= 0) return;
+      return await predict({ images: value, model: key }); // Ensure await here
+    })
+  );
+
+  predictions.forEach((p, idx) =>
     store.commit("insert", {
-      payload: result,
-      storeName: key,
+      payload: p,
+      storeName: Object.keys(categories)[idx],
       type: "result",
-    });
-  }
+    })
+  );
 
-  const results = store.getters.getResults;
+  const results = store.getters.getResults; // Likely no need for await here
 
   const story = await generateStory({
     characters: results[0],
@@ -45,26 +60,26 @@ const handleSubmit = async (e) => {
 <template>
   <form class="dropzones-form" :onSubmit="handleSubmit">
     <div class="dropzones-container">
+      <button class="dropzones-form__btn">
+        <p v-if="!isLoading">GENERAR HISTORIA</p>
+        <div class="loader" v-else />
+      </button>
       <ImageDropzone
         title="Personajes"
-        backgroundColor="#98DDCA"
         storeName="characters"
+        backgroundColor="#fff"
       />
       <ImageDropzone
         title="Emociones"
-        backgroundColor="#D5ECC2"
         storeName="emotions"
+        backgroundColor="#fff"
       />
       <ImageDropzone
         title="Escenarios"
-        backgroundColor="#FFD3B4"
         storeName="scenarios"
+        backgroundColor="#fff"
       />
     </div>
-    <button class="dropzones-form__btn">
-      <p v-if="!isLoading">GENERAR HISTORIA</p>
-      <div class="loader" v-else />
-    </button>
   </form>
 </template>
 
@@ -93,23 +108,31 @@ const handleSubmit = async (e) => {
   }
 }
 .dropzones-container {
-  width: fit-content;
-  height: 50vh;
+  width: 400px;
   display: flex;
+  flex-direction: column;
   gap: 20px;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: flex-start;
   padding: 20px;
+  overflow: auto;
+  max-height: calc(100vh - 40px);
+
+  background: lavenderblush;
+  border-right: 2px solid #000;
 }
 
 .dropzones-form {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: calc(100vh - 40px);
+  position: relative;
 }
 
 .dropzones-form__btn {
-  width: 80%;
+  width: 100%;
   padding: 10px;
   border: none;
   outline: none;
