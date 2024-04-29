@@ -5,7 +5,7 @@ import * as lt from "../assets/lottiebook.json";
 
 const store = useStore();
 
-const story = computed(() => store.getters.getStories[0]);
+const story = computed(() => store.state.stories[0]);
 const details = computed(() => store.state.results);
 
 const isShowStory = ref(true);
@@ -41,10 +41,16 @@ const tabs = [
         {{ story }}
       </p>
       <div class="story-text" v-if="details && isShowDetails">
-        "Details"
-        <span v-for="[key, value] of Object.entries(details)">
-          {{ key }} : {{ value }}
-          <span v-for="val of value">{{ key }}: {{ val }}</span>
+        <span
+          class="story-details-container"
+          v-for="[key, value] of Object.entries(details)"
+        >
+          <span class="story-details-wrapper">
+            <span class="story-details-key">{{ key }}</span>
+            <span class="story-details-value" v-for="val of value">
+              <p>{{ val }}</p>
+            </span>
+          </span>
         </span>
       </div>
       <lottie
@@ -59,9 +65,8 @@ const tabs = [
 
 <style scoped>
 .chatbox {
-  min-width: calc(100% - 400px);
+  width: calc(100% - 400px);
   height: 100%;
-  max-width: 1200px;
   position: absolute;
   right: 0;
   top: 0;
@@ -72,6 +77,27 @@ const tabs = [
   opacity: 0.1;
   width: 100%;
   pointer-events: none;
+}
+
+.story-details-container {
+  display: flex;
+  gap: 20px;
+  flex-direction: column;
+}
+
+.story-details-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.story-details-key {
+  font-size: 2rem;
+  text-transform: uppercase;
+  width: 100%;
+  border-bottom: 1px solid;
+}
+.story-details-value {
+  font-size: 1.3rem;
 }
 
 .story-text {

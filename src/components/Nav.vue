@@ -10,7 +10,7 @@ const handleReset = () => {
 
 <template>
   <nav>
-    <span class="nav-title"> StoryAI </span>
+    <a href="/" class="nav-title"> StoryAI </a>
     <ul class="options">
       <li @click="handleReset" v-if="store.state.isAppInitialized">
         Reiniciar
@@ -31,5 +31,25 @@ nav {
   padding: 0 10px;
   z-index: 9999;
   justify-content: space-between;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
+
+ul {
+  list-style: none;
+  user-select: none;
+}
+
+li {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+li:hover {
+  background: rgba(0, 0, 0, 0.2);
 }
 </style>

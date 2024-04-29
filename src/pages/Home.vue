@@ -92,7 +92,7 @@ watch(isActive, () => {
   border-radius: 4px;
   font-size: 1rem;
   color: white;
-  margin-bottom: 450px;
+  margin-bottom: calc(100vh - 450px);
 }
 
 .dropzone-container {
